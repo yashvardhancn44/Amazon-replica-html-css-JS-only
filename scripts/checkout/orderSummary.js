@@ -5,33 +5,24 @@ import {
   updateCartItemQuantity,
   updateDeliveryOption,
 } from "../../data/cart.js";
-import { products } from "../../data/products.js";
+import { products, getProduct } from "../../data/products.js";
 import formatCurrency from "../utils/money.js";
 import { hello } from "https://unpkg.com/supersimpledev@1.0.1/hello.esm.js";
 import dayjs from "https://unpkg.com/dayjs@1.11.10/esm/index.js";
-import { deliveryOptions } from "../../data/deliveryOptions.js";
-
-hello();
-const today = dayjs();
-const deliveryDate = today.add(7, "days");
-
-console.log(deliveryDate);
-console.log(deliveryDate.format("dddd,MMMM,D"));
+import {
+  deliveryOptions,
+  getDeliveryOption,
+} from "../../data/deliveryOptions.js";
 
 export function renderOrderSummary() {
   let cartSummaryHTML = "";
 
   cart.forEach((cartItem) => {
-    const matchingProduct = getMatchingProduct(cartItem.productId);
+    const matchingProduct = getProduct(cartItem.productId);
     // the above step is to get the product detaisl of the cart item.
 
     const deliveryOptionId = cartItem.deliveryOptionId;
-    let deliveryOption;
-    deliveryOptions.forEach((option) => {
-      if (option.id === deliveryOptionId) {
-        deliveryOption = option;
-      }
-    });
+    const deliveryOption = getDeliveryOption(deliveryOptionId);
 
     const today = dayjs();
     const deliveryDate = today.add(deliveryOption.deliveryDays, "days");
@@ -189,16 +180,6 @@ export function renderOrderSummary() {
     });
   });
   // console.log(cartSummaryHTML);
-
-  function getMatchingProduct(productId) {
-    let matchingProduct;
-    products.forEach((product) => {
-      if (product.id === productId) {
-        matchingProduct = product;
-      }
-    });
-    return matchingProduct;
-  }
 
   //1. update the deliveryOptionId in the cart
   //2. update the page.
