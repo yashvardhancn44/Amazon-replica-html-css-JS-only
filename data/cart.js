@@ -9,7 +9,9 @@ export let cart = JSON.parse(localStorage.getItem("cart")) || [
   },
 ]; //creating some default values to use to develop our checkout page.
 
-function saveToStorage() {
+// JSON.parse(localStorage.getItem("cart")) ||
+
+export function saveToStorage() {
   localStorage.setItem("cart", JSON.stringify(cart));
 }
 
@@ -55,5 +57,16 @@ export function removeFromCart(productId) {
     }
   });
   cart = newCart;
+  saveToStorage();
+}
+
+export function updateCartItemQuantity(productId, newQuantity) {
+  let item;
+  cart.forEach((cartItem) => {
+    if (cartItem.productId === productId) {
+      item = cartItem;
+    }
+  });
+  item.quantity = newQuantity;
   saveToStorage();
 }
