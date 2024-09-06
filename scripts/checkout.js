@@ -1,17 +1,11 @@
-import { cart, removeFromCart } from "../data/cart.js";
+import { cart, removeFromCart, getCartQuantity } from "../data/cart.js";
 import { products } from "../data/products.js";
 import { formatCurrency } from "./utils/money.js";
 
 let cartSummaryHTML = "";
 
 cart.forEach((cartItem) => {
-  const productId = cartItem.productId;
-  let matchingProduct;
-  products.forEach((product) => {
-    if (product.id === productId) {
-      matchingProduct = product;
-    }
-  });
+  const matchingProduct = getMatchingProduct(cartItem.productId);
 
   cartSummaryHTML += `
         <div class="cart-item-container js-cart-item-container-${
@@ -37,7 +31,9 @@ cart.forEach((cartItem) => {
                     cartItem.quantity
                   }</span>
                 </span>
-                <span class="update-quantity-link link-primary">
+                <span class="update-quantity-link js-update-quantity-link link-primary" data-product-id="${
+                  matchingProduct.id
+                }">
                   Update
                 </span>
                 <span class="delete-quantity-link link-primary js-delete-link" data-product-id="${
@@ -99,6 +95,27 @@ cart.forEach((cartItem) => {
 
 document.querySelector(".js-order-summary").innerHTML = cartSummaryHTML;
 
+updateCartQuantity(); // there is no Naming conflict because of use of Modules.
+function updateCartQuantity() {
+  const cartQuantity = getCartQuantity(cart);
+  if (cartQuantity === 0) {
+    document.querySelector(
+      ".js-checkout-header-middle-section"
+    ).innerHTML = `Checkout (<a class="return-to-home-link" href="amazon.html"></a>)`;
+  } else {
+    document.querySelector(
+      ".js-checkout-header-middle-section"
+    ).innerHTML = `Checkout (<a class="return-to-home-link" href="amazon.html">${cartQuantity}</a>)`;
+  }
+}
+
+document
+  .querySelectorAll(".js-update-quantity-link")
+  .forEach((updateLinkElement) => {
+    const productId = updateLinkElement.dataset.productId;
+    updateLinkElement.addEventListener("click", () => {});
+  });
+
 //1. Remove product from cart
 //2. Remove product from page
 document.querySelectorAll(".js-delete-link").forEach((deleteLink) => {
@@ -109,7 +126,18 @@ document.querySelectorAll(".js-delete-link").forEach((deleteLink) => {
       `.js-cart-item-container-${productId}`
     );
     container.remove();
+    updateCartQuantity();
   });
 });
 
 // console.log(cartSummaryHTML);
+
+function getMatchingProduct(productId) {
+  let matchingProduct;
+  products.forEach((product) => {
+    if (product.id === productId) {
+      matchingProduct = product;
+    }
+  });
+  return matchingProduct;
+}
