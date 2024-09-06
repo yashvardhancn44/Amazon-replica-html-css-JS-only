@@ -12,8 +12,10 @@ import dayjs from "https://unpkg.com/dayjs@1.11.10/esm/index.js";
 import {
   deliveryOptions,
   getDeliveryOption,
+  calculateDeliveryDate,
 } from "../../data/deliveryOptions.js";
 import { renderPaymentSummary } from "./paymentSummary.js";
+import { renderCheckoutHeader } from "./checkoutHeader.js";
 
 export function renderOrderSummary() {
   let cartSummaryHTML = "";
@@ -25,9 +27,7 @@ export function renderOrderSummary() {
     const deliveryOptionId = cartItem.deliveryOptionId;
     const deliveryOption = getDeliveryOption(deliveryOptionId);
 
-    const today = dayjs();
-    const deliveryDate = today.add(deliveryOption.deliveryDays, "days");
-    const dateString = deliveryDate.format("dddd, MMMM D");
+    const dateString = calculateDeliveryDate(deliveryOption);
 
     cartSummaryHTML += `
           <div class="cart-item-container js-cart-item-container-${
@@ -89,9 +89,7 @@ export function renderOrderSummary() {
     let html = "";
 
     deliveryOptions.forEach((deliveryOption) => {
-      const today = dayjs();
-      const deliveryDate = today.add(deliveryOption.deliveryDays, "days");
-      const dateString = deliveryDate.format("dddd, MMMM D");
+      const dateString = calculateDeliveryDate(deliveryOption);
       const priceString =
         deliveryOption.priceCents === 0
           ? "Free"
@@ -125,20 +123,6 @@ export function renderOrderSummary() {
     return html;
   }
 
-  updateCartQuantity(); // there is no Naming conflict because of use of Modules.
-  function updateCartQuantity() {
-    const cartQuantity = getCartQuantity(cart);
-    if (cartQuantity === 0) {
-      document.querySelector(
-        ".js-checkout-header-middle-section"
-      ).innerHTML = `Checkout (<a class="return-to-home-link" href="amazon.html"></a>)`;
-    } else {
-      document.querySelector(
-        ".js-checkout-header-middle-section"
-      ).innerHTML = `Checkout (<a class="return-to-home-link" href="amazon.html">${cartQuantity}</a>)`;
-    }
-  }
-
   document
     .querySelectorAll(".js-update-quantity-link")
     .forEach((updateLinkElement) => {
@@ -157,10 +141,9 @@ export function renderOrderSummary() {
                 document.querySelector(`.js-quantity-input-${productId}`).value
               );
               updateCartItemQuantity(productId, newQuantity);
-              document.querySelector(
-                `.js-quantity-label-${productId}`
-              ).innerHTML = newQuantity;
-              updateCartQuantity();
+              renderPaymentSummary();
+              renderOrderSummary();
+              renderCheckoutHeader();
               cartItemContainer.classList.remove("is-editing-quantity");
             });
           });
@@ -174,11 +157,8 @@ export function renderOrderSummary() {
     deleteLink.addEventListener("click", () => {
       removeFromCart(productId); //updating the data
       renderPaymentSummary(); // regenerating the HTML
-      const container = document.querySelector(
-        `.js-cart-item-container-${productId}`
-      );
-      container.remove();
-      updateCartQuantity();
+      renderOrderSummary();
+      renderCheckoutHeader();
     });
   });
   // console.log(cartSummaryHTML);
