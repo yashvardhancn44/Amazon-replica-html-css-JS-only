@@ -43,29 +43,6 @@ class Clothing extends Product {
   }
 }
 
-/*
-console.log(this); // undefined
-const object2 = {
-  a: 2,
-  b: this.a, //undefined and gives an error as we are trying to asign something before creating it. and before creating. this will not be able to access it. this will be equal to undefined. 
-};
-
-
-function logThis() {
-  console.log(this); // again this is undefined
-}
-logThis(); // prints undefined
-logThis.call("hello"); // the first parameter can be whatever we want this to be.
-
-this;
-const object3 = {
-  method: () => {
-    console.log(`logging this inside arrow function-> ${this}`);
-  },
-};
-object3.method();
-*/
-
 export function getProduct(productId) {
   let matchingProduct;
   products.forEach((product) => {
@@ -76,6 +53,27 @@ export function getProduct(productId) {
   return matchingProduct;
 }
 
+export let products = [];
+export function loadProducts(fun) {
+  const xhr = new XMLHttpRequest();
+
+  xhr.addEventListener("load", () => {
+    products = JSON.parse(xhr.response).map((productDetails) => {
+      if (productDetails.type === "clothing") {
+        return new Clothing(productDetails);
+      } else {
+        return new Product(productDetails);
+      }
+    });
+    console.log("Load Products");
+    fun();
+  });
+
+  xhr.open("GET", "https://supersimplebackend.dev/products");
+  xhr.send();
+}
+
+/*
 export const products = [
   {
     id: "e43638ce-6aa0-4b85-b27f-e1d07eb678c6",
@@ -554,3 +552,4 @@ export const products = [
     return new Product(productDetails);
   }
 });
+*/
