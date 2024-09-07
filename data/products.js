@@ -44,22 +44,26 @@ class Clothing extends Product {
 }
 
 /*
-// using a practice code and then implementing over the entire array
-const tshirt = new Clothing({
-  id: "83d4ca15-0f35-48f5-b7a3-1ea210004f2e",
-  image: "images/products/adults-plain-cotton-tshirt-2-pack-teal.jpg",
-  name: "Adults Plain Cotton T-Shirt - 2 Pack",
-  rating: {
-    stars: 4.5,
-    count: 56,
+console.log(this); // undefined
+const object2 = {
+  a: 2,
+  b: this.a, //undefined and gives an error as we are trying to asign something before creating it. and before creating. this will not be able to access it. this will be equal to undefined. 
+};
+
+
+function logThis() {
+  console.log(this); // again this is undefined
+}
+logThis(); // prints undefined
+logThis.call("hello"); // the first parameter can be whatever we want this to be.
+
+this;
+const object3 = {
+  method: () => {
+    console.log(`logging this inside arrow function-> ${this}`);
   },
-  priceCents: 799,
-  keywords: ["tshirts", "apparel", "mens"],
-  type: "clothing",
-  sizeChartLink: "images/clothing-size-chart.png",
-});
-console.log(tshirt);
-console.log(tshirt.sizeChartLink);
+};
+object3.method();
 */
 
 export function getProduct(productId) {
