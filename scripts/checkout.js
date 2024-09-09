@@ -8,6 +8,34 @@ import { loadCart } from "../data/cart.js";
 
 console.log(loadProductsFetch());
 
+async function loadPage() {
+  await loadProductsFetch(); // instead of loadProductsFetch().then(()=>{})
+  await new Promise((resolve) => {
+    loadCart(() => {
+      resolve();
+    });
+  });
+
+  renderOrderSummary();
+  renderPaymentSummary();
+  renderCheckoutHeader();
+}
+loadPage();
+
+/*
+//practicing Async Await
+async function loadPage() {
+  console.log("load page");
+  await loadProductsFetch(); // instead of loadProductsFetch().then(()=>{})
+  return "value2"; // this line is equivalent to resolve('value2') which can be used in .then((value)=>{})
+}
+loadPage().then((value) => {
+  console.log("next step");
+  console.log(value);
+});
+*/
+
+/*
 Promise.all([
   loadProductsFetch(),
   new Promise((resolve) => {
@@ -22,6 +50,7 @@ Promise.all([
   renderPaymentSummary();
   renderCheckoutHeader();
 });
+*/
 
 /*
 new Promise((resolve) => {
