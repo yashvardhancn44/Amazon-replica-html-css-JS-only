@@ -9,12 +9,19 @@ import { loadCart } from "../data/cart.js";
 console.log(loadProductsFetch());
 
 async function loadPage() {
-  await loadProductsFetch(); // instead of loadProductsFetch().then(()=>{})
-  await new Promise((resolve) => {
-    loadCart(() => {
-      resolve();
+  try {
+    // throw 'error1'; // we can give any value, it will skip directly to catch.
+    await loadProductsFetch();
+    await new Promise((resolve, reject) => {
+      // throw "error2";
+      loadCart(() => {
+        // reject("error3");
+        resolve();
+      });
     });
-  });
+  } catch (error) {
+    console.log("Unexpected Error. Please try Again");
+  }
 
   renderOrderSummary();
   renderPaymentSummary();
